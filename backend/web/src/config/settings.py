@@ -21,8 +21,8 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 SITE_ID = 3
-# Application definition
 
+# Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -33,9 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     "allauth",
     "allauth.account",
-    # Optional -- requires install using `django-allauth[socialaccount]`.
     "allauth.socialaccount",
-   
     'allauth.socialaccount.providers.google',
     # Third-party apps
     "corsheaders",
@@ -45,7 +43,6 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "dj_rest_auth",
     "dj_rest_auth.registration",
-  
     # Local apps
     "project.core",
     "project.authentication",
@@ -60,7 +57,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # Add the account middleware:
     "allauth.account.middleware.AccountMiddleware",
 ]
 
@@ -77,7 +73,6 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                # `allauth` needs this from django
                 "django.template.context_processors.request",
             ],
         },
@@ -85,27 +80,49 @@ TEMPLATES = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    # Needed to login by username in Django admin, regardless of `allauth`
     "django.contrib.auth.backends.ModelBackend",
-    # `allauth` specific authentication methods, such as login by email
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
+
+# ============================================================================
+# ALLAUTH CONFIGURATION - Fixed to redirect to frontend
+# ============================================================================
+
+# Redirect URLs - Point to your frontend
+LOGIN_REDIRECT_URL = 'http://localhost:3000'
+LOGOUT_REDIRECT_URL = 'http://localhost:3000/'
+
+# Account settings
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = "email"  # or 'username_email'
+ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_USERNAME_REQUIRED = False
 
-ACCOUNT_USERNAME_REQUIRED = False  # or 'mandatory' or 'none'
+# Social account settings - Skip Django's intermediate pages
+SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'
+SOCIALACCOUNT_EMAIL_REQUIRED = False
+SOCIALACCOUNT_QUERY_EMAIL = True
 
+# Google OAuth provider settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'VERIFIED_EMAIL': True,
+        'VERSION': 'v2',
+    }
+}
 
-# #Provider specific settings
-# SOCIALACCOUNT_PROVIDERS = {
-#     # "google": {
-#     #     # For each OAuth based provider, either add a ``SocialApp``
-#     #     # (``socialaccount`` app) containing the required client
-#     #     # credentials, or list them here:
-#     #     "APP": {"client_id": "123", "secret": "456", "key": ""}
-#     # }
-# }
+# ============================================================================
+# END ALLAUTH CONFIGURATION
+# ============================================================================
 
 WSGI_APPLICATION = "config.wsgi.application"
 
@@ -120,6 +137,7 @@ DATABASES = {
         "PORT": os.getenv("DB_PORT", ""),
     }
 }
+
 DB_USERNAME = os.environ.get("POSTGRES_USER")
 DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 DB_HOST = os.environ.get("POSTGRES_HOST")
@@ -127,7 +145,7 @@ DB_PORT = os.environ.get("POSTGRES_PORT")
 DB_DATABASE = os.environ.get("POSTGRES_DB")
 DB_IS_AVAIL = all([DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT])
 
-DB_IGNORE_SSL=os.environ.get("DB_IGNORE_SSL")=="true"
+DB_IGNORE_SSL = os.environ.get("DB_IGNORE_SSL") == "true"
 
 if DB_IS_AVAIL:
     DATABASES = {
@@ -145,7 +163,6 @@ if DB_IS_AVAIL:
         DATABASES["default"]["OPTIONS"] = {
             'sslmode': 'require',
         }
-
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
