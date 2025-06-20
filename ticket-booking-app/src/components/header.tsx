@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Menu, X, User, Ticket, ShoppingCart } from "lucide-react"
 import { Disclosure } from "@headlessui/react"
 import Link from "next/link"
+import AuthButton from "./ui/Button/AuthButton"
 
 export default function Header() {
   const [cartCount, setCartCount] = useState(0)
@@ -96,6 +97,7 @@ export default function Header() {
                 <div className="ml-3">
                   <div className="text-base font-medium text-gray-800">Sign In</div>
                   <div className="text-sm font-medium text-gray-500">or Create Account</div>
+                  <AuthButton />
                 </div>
                 <button className="ml-auto flex-shrink-0 bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none">
                   <ShoppingCart className="h-6 w-6" />
