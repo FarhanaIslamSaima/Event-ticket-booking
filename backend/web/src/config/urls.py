@@ -24,7 +24,7 @@ urlpatterns = [
 
 # ADD THIS LINE - This is what's missing!
 
-print(urlpatterns)
+
 # Serve media files in development
 print("this is debug info", settings.DEBUG)
 if settings.DEBUG:

@@ -1,6 +1,6 @@
 
 import { getTokenFromLocal, removeTokenFromLocal, setTokenInLocal } from "@/utils/FormData/localStorage"
-import { jwtDecode } from "jwt-decode"
+import { DecodedData } from "@/type/common"
 import axios from "axios"
 
 const key = 'accessToken'
@@ -26,14 +26,15 @@ export const getUserProfile = async () => {
       headers: {
         // Try this format first (most common for Django)
         Authorization: 'Token ' + token
-        
+
       },
     });
     console.log('Response status:', response);
-    
+
     if (response.status === 200) {
       console.log('User profile fetched successfully:', response.data);
-      return response.data;
+      let data : DecodedData = response.data;
+      return data;
     } else {
       throw new Error('Failed to fetch user profile');
     }

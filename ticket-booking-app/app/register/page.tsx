@@ -37,7 +37,7 @@ const Register = () => {
     try {
       const response = await createUser(data)
       console.log(response)
-      toast.success("Registration successful! Please log in.")
+      toast.success("A verification email has been sent to your email address. Please check your inbox to complete the registration process.")
       // Handle success - maybe redirect or show success message
     } catch (error: any) {
       console.error("Error during registration:", error)
