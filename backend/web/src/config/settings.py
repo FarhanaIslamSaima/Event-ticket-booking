@@ -13,11 +13,12 @@ read_dotenv()
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-key-for-development-only")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", "False") == "True"
+DEBUG = os.getenv("DEBUG")
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 SITE_ID = 3
@@ -92,11 +93,19 @@ AUTHENTICATION_BACKENDS = [
 LOGIN_REDIRECT_URL = 'http://localhost:3000'
 LOGOUT_REDIRECT_URL = 'http://localhost:3000/'
 
-# Account settings
+
+
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"  # Required for email verification
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_USERNAME_REQUIRED = False
+
+ACCOUNT_EMAIL_CONFIRMATION_URL = "register/verify-email/{key}/"  # just the path
+FRONTEND_URL = "http://localhost:3000"  # your React app URL
+ACCOUNT_ADAPTER = "project.authentication.account_adapter.CustomAccountAdapter"
+
+
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 
 # Social account settings - Skip Django's intermediate pages
 SOCIALACCOUNT_LOGIN_ON_GET = True
@@ -164,6 +173,13 @@ if DB_IS_AVAIL:
             'sslmode': 'require',
         }
 
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT"))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS") == "True"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -186,10 +202,21 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# # Static files (CSS, JavaScript, Images)
+# STATIC_URL = "/static/"
+# STATIC_ROOT = BASE_DIR / "staticfiles"
+# STATICFILES_DIRS = []  # Remove the static directory since it doesn't exist
+# Static files configuration
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+   
+]
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
+print(f"STATIC_ROOT: {STATIC_ROOT}")
 
 # Media files
 MEDIA_URL = "media/"
