@@ -90,8 +90,10 @@ AUTHENTICATION_BACKENDS = [
 # ============================================================================
 
 # Redirect URLs - Point to your frontend
-LOGIN_REDIRECT_URL = 'http://localhost:3000'
+  # React app callback URL
+LOGIN_REDIRECT_URL = "http://localhost:3000/auth/callback" # React app callback URL
 LOGOUT_REDIRECT_URL = 'http://localhost:3000/'
+SOCIALACCOUNT_ADAPTER = "project.authentication.account_adapter.CustomSocialAccountAdapter"
 
 
 
@@ -105,6 +107,8 @@ FRONTEND_URL = "http://localhost:3000"  # your React app URL
 ACCOUNT_ADAPTER = "project.authentication.account_adapter.CustomAccountAdapter"
 
 
+
+
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 
 # Social account settings - Skip Django's intermediate pages
@@ -113,6 +117,7 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'
 SOCIALACCOUNT_EMAIL_REQUIRED = False
 SOCIALACCOUNT_QUERY_EMAIL = True
+
 
 # Google OAuth provider settings
 SOCIALACCOUNT_PROVIDERS = {
@@ -128,6 +133,7 @@ SOCIALACCOUNT_PROVIDERS = {
         'VERSION': 'v2',
     }
 }
+
 
 # ============================================================================
 # END ALLAUTH CONFIGURATION
@@ -230,7 +236,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
-         "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -263,30 +269,13 @@ SPECTACULAR_SETTINGS = {
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {message}",
-            "style": "{",
-        },
-    },
     "handlers": {
-        "file": {
-            "level": "INFO",
-            "class": "logging.FileHandler",
-            "filename": BASE_DIR / "logs/django.log",
-            "formatter": "verbose",
-        },
         "console": {
-            "level": "INFO",
             "class": "logging.StreamHandler",
-            "formatter": "verbose",
         },
     },
-    "loggers": {
-        "django": {
-            "handlers": ["file", "console"],
-            "level": "INFO",
-            "propagate": True,
-        },
+    "root": {
+        "handlers": ["console"],
+        "level": "DEBUG",
     },
 }

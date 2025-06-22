@@ -53,7 +53,10 @@ const Login = () => {
     setIsGoogleLoading(true)
     try {
       // Redirect to your Django Google OAuth endpoint
-       window.location.href = `http://localhost:8000/api/v1/accounts/google/login/`
+ // frontend route to handle token
+       const loginUrl = `http://localhost:8000/accounts/google/login/?process=login`;
+       window.location.href = loginUrl;
+
     } catch (error) {
       console.error("Google login error:", error)
       toast.error("Google login failed. Please try again.")

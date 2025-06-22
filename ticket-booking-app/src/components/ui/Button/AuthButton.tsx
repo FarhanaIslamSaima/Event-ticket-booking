@@ -22,7 +22,7 @@ const AuthButton = () => {
             setUser(userInfo);
        };
        fetchUserInfo();
-    }, []);
+    }, [User]);
 
     if (!user) {
     return (
@@ -57,7 +57,7 @@ const AuthButton = () => {
           <DropdownMenuSeparator />
 
           <DropdownMenuItem
-           
+            onClick={handleLogout}
             className="cursor-pointer hover:bg-gray-50 text-red-600 focus:text-red-600"
           >
             Logout
