@@ -5,9 +5,20 @@ import axios from "axios"
 
 const key = 'accessToken'
 
-
 export const saveAccessToken = async (data: { accessToken: string }) => {
-    return setTokenInLocal(key, data.accessToken)
+  // Make sure the token is actually saved before proceeding
+  const result = setTokenInLocal(key, data.accessToken)
+
+  // Add a small delay to ensure localStorage write is complete
+  await new Promise((resolve) => setTimeout(resolve, 100))
+
+  // Verify the token was saved
+  const savedToken = getTokenFromLocal(key)
+  if (savedToken !== data.accessToken) {
+    throw new Error("Failed to save token to localStorage")
+  }
+
+  return result
 }
 export const removeAccessToken = () => {
     return removeTokenFromLocal(key)

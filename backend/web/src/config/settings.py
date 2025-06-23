@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     # Local apps
     "project.core",
     "project.authentication",
+    "project.event"
 ]
 
 MIDDLEWARE = [
@@ -165,7 +166,7 @@ DB_IGNORE_SSL = os.environ.get("DB_IGNORE_SSL") == "true"
 if DB_IS_AVAIL:
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.postgresql",
+            "ENGINE": "django.db.backends.sqlite3",
             "NAME": DB_DATABASE,
             "USER": DB_USERNAME,
             "PASSWORD": DB_PASSWORD,

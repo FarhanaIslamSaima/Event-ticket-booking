@@ -6,25 +6,59 @@ import { useRouter } from 'next/navigation';
 import { DecodedData } from '@/type/common';
 import {  User } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { getTokenFromLocal } from '@/utils/FormData/localStorage';
 import {DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator} from "@/components/ui/dropdown-menu"
+import { userInfo } from 'os';
+import { get } from 'http';
 
 const AuthButton = () => {
     const[user,setUser] = useState<DecodedData>();
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
     const handleLogout = () => {
         removeAccessToken();
+        router.refresh()
+        setUser(undefined);
         router.push('login');
+         
     };
     useEffect(() => {
-       const fetchUserInfo = async () => {
-           const userInfo = await getUserProfile();
-            console.log("User Info:", userInfo);
-            setUser(userInfo);
-       };
-       fetchUserInfo();
-    }, [User]);
+    const fetchUserInfo = async () => {
+      try {
+        setLoading(true)
+        console.log(getTokenFromLocal('accessToken'))
+        if(getTokenFromLocal('accessToken')==null) {
+        
 
-    if (!user) {
+        }
+        if(getTokenFromLocal('accessToken')!='') {
+        const userInfo = await getUserProfile()
+        
+        console.log("User Info:", userInfo)
+        setUser(userInfo)
+        }
+      
+      } catch (error) {
+        console.error("Failed to fetch user info:", error)
+        setUser(undefined)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchUserInfo()
+  }, []) // Remove 'user' from dependency array
+
+  // Show loading state
+  if (loading) {
+    return (
+      <Button variant="outline" disabled className="bg-white text-gray-700 border-gray-300">
+        Loading...
+      </Button>
+    )
+  }
+
+    if (!user && !loading) {
     return (
       <Button onClick={() => router.push('/login')} variant="outline" className="bg-white text-gray-700 border-gray-300 hover:bg-gray-50">
         Login
@@ -64,7 +98,7 @@ const AuthButton = () => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-       <span className="text-sm text-gray-700 font-medium">Welcome, {user.username}!</span>
+       <span className="text-sm text-gray-700 font-medium">Welcome, {user && user.username}!</span>
     </div>
   )
 };

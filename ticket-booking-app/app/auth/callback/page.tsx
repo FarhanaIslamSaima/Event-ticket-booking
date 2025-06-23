@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { saveAccessToken } from '@/service/actions/authService'
+import { getTokenFromLocal } from '@/utils/FormData/localStorage'
 
 export default function AuthCallback() {
   const router = useRouter()
@@ -16,9 +17,15 @@ export default function AuthCallback() {
     if (token) {
       // Store the token (localStorage, cookies, or your preferred method)
        console.log('Token received:', token)
-       saveAccessToken({accessToken:token})
-       router.push('/') // Redirect to dashboard or home page
        
+       saveAccessToken({accessToken:token})
+        const storedToken = getTokenFromLocal('accessToken')
+          if (storedToken && storedToken.trim() !== '') {
+            router.push('/')
+          } else {
+            router.push('/login')
+          }// Redirect to dashboard or home page
+                
      
     
       // Redirect to dashboard or home page
