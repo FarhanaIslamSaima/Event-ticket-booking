@@ -17,7 +17,7 @@ export default function AuthCallback() {
     if (token) {
       // Store the token (localStorage, cookies, or your preferred method)
        console.log('Token received:', token)
-       
+
        saveAccessToken({accessToken:token})
         const storedToken = getTokenFromLocal('accessToken')
           if (storedToken && storedToken.trim() !== '') {
@@ -25,11 +25,11 @@ export default function AuthCallback() {
           } else {
             router.push('/login')
           }// Redirect to dashboard or home page
-                
-     
-    
+
+
+
       // Redirect to dashboard or home page
-     
+
     } else {
       // Handle error case
       router.push('/login?error=auth_failed')

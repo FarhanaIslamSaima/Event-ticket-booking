@@ -20,24 +20,21 @@ const AuthButton = () => {
         router.refresh()
         setUser(undefined);
         router.push('login');
-         
+
     };
     useEffect(() => {
     const fetchUserInfo = async () => {
       try {
         setLoading(true)
         console.log(getTokenFromLocal('accessToken'))
-        if(getTokenFromLocal('accessToken')==null) {
-        
-
-        }
+       
         if(getTokenFromLocal('accessToken')!='') {
         const userInfo = await getUserProfile()
-        
+
         console.log("User Info:", userInfo)
         setUser(userInfo)
         }
-      
+
       } catch (error) {
         console.error("Failed to fetch user info:", error)
         setUser(undefined)
@@ -68,7 +65,7 @@ const AuthButton = () => {
 
   return (
     <div className="flex items-center gap-3">
-     
+
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

@@ -3,7 +3,7 @@ import './globals.css'
 import { ToastContainer, toast } from 'react-toastify';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
-
+import Providers from '@/lib/Providers/Provider';
 export const metadata: Metadata = {
   title: 'v0 App',
   description: 'Created with v0',
@@ -18,10 +18,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ToastContainer/>
-        <Header />
-        {children}
-        <Footer />
+        <Providers>
+          <ToastContainer/>
+          <Header />
+          {children}
+          <Footer />
+        </Providers>
       </body>
     </html>
   )

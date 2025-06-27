@@ -38,9 +38,13 @@ const Login = () => {
       if (response.key) {
         saveAccessToken({ accessToken: response.key })
       }
-
+      // Reload to update the auth state
+      window.location.href = "/";
       toast.success("Login successful!")
-      router.push("/")
+
+      
+
+    
     } catch (error: any) {
       console.error("Error during login:", error)
       toast.error("Login failed. Please check your credentials.")

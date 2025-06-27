@@ -12,7 +12,6 @@ class Event(models.Model):
     available_tickets = models.IntegerField()
     base_price = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=50)
-    image_url = models.URLField(blank=True, null=True)
     terms_conditions = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

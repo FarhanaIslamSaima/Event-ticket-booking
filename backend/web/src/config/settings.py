@@ -4,7 +4,7 @@ Django settings for config project.
 
 import os
 from pathlib import Path
-
+from corsheaders.defaults import default_headers
 from dotenv import read_dotenv
 
 # Load environment variables from .env file
@@ -25,6 +25,7 @@ SITE_ID = 3
 
 # Application definition
 INSTALLED_APPS = [
+     
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -60,10 +61,33 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'accepts',  # This is the missing header causing your issue
+]
+
+# Allow all HTTP methods
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
 ]
 
 ROOT_URLCONF = "config.urls"
-
+CORS_ALLOW_ALL_ORIGINS = True
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -217,7 +241,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
-   
+
 ]
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
