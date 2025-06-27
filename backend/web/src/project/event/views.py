@@ -4,10 +4,9 @@ from .models import Event, Category, Venue
 from .serializers import EventSerializer, CategorySerializer, VenueSerializer
 
 
-class VenueCreateAPIView(generics.CreateAPIView):
+class VenueListCreateAPIView(generics.ListCreateAPIView):
     queryset = Venue.objects.all()
-    serializer_class = VenueSerializer
-    
+    serializer_class = VenueSerializer  
 
 # Create your views here.
 class EventCreateAPIView(generics.CreateAPIView):

@@ -1,8 +1,8 @@
 # urls.py
 from django.urls import path
-from .views import VenueCreateAPIView
+from .views import VenueListCreateAPIView
 
 urlpatterns = [
-    path('create/', VenueCreateAPIView.as_view(), name='api-venue-create'),
+     path('venues/', VenueListCreateAPIView.as_view(), name='venue-list-create'),
     
 ]
