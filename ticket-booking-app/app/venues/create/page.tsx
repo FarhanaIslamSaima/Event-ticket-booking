@@ -5,17 +5,23 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import ReUseForm from '@/components/Form/ReForm';
 import ReUseInput from '@/components/Form/ReInput';
-import { venueApi } from '@/Redux/api/venueApi';
+import { useCreateVenueMutation} from '@/redux/api/venueApi';
 import {toast} from 'react-toastify'
 
 
 const page = () => {
-    const [createVenue] = venueApi.useCreateVenueMutation();
+    const [createVenue] = useCreateVenueMutation();
     const handleSubmit = async(data: any) => {
         console.log("Form submitted with data:", data);
 
         const res= await createVenue(data).unwrap();
         console.log("Response from createVenue:", res)
+        if (res?.id) {
+            toast.success("Venue created successfully!");
+            // Redirect to the newly created venue page
+        } else {
+            toast.error("Failed to create venue. Please try again.");
+        }
        
     }
 
