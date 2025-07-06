@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import generics
+from rest_framework import generics,permissions
 from rest_framework.response import Response
 from .models import Event, Category, Venue
 from .serializers import EventSerializer, CategorySerializer, VenueSerializer
@@ -7,11 +7,18 @@ from .serializers import EventSerializer, CategorySerializer, VenueSerializer
 
 class VenueListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = VenueSerializer
-    
+    permission_classes = [permissions.AllowAny]
     def get_queryset(self):
         queryset = Venue.objects.all()
         
         # Active status filter
+        id= self.request.query_params.get('id')
+        if id is not None:
+            try:
+                queryset = queryset.filter(id=int(id))
+            except ValueError:
+                queryset = queryset.none()
+                
         is_active = self.request.query_params.get('is_active')
         if is_active is not None:
             if is_active.lower() in ['true', '1']:
@@ -79,6 +86,15 @@ class VenueListCreateAPIView(generics.ListCreateAPIView):
 
 
 # Create your views here.
-class EventCreateAPIView(generics.CreateAPIView):
+class EventListCreateAPIView(generics.ListCreateAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
+    permission_classes = [permissions.AllowAny]
+    def perform_create(self, serializer):
+        # Automatically set the organizer to the current user
+        serializer.save(organizer=self.request.user)
+
+class CategoryListAPIView(generics.ListAPIView):
+    queryset=Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.AllowAny]  # 👈 This makes it public

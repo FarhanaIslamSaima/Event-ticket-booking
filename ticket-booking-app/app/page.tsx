@@ -8,9 +8,12 @@ import EventCard from "@/components/event-card"
 import FeaturedEvent from "@/components/featured-event"
 import Header from "@/components/header" // Correct case: lowercase 'h'
 import Footer from "@/components/footer"
+import {useGetEventsQuery } from "@/redux/api/eventApi"
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("")
+  const { data: eventsData, isLoading, error } = useGetEventsQuery()
+  console.log("Events Data:", eventsData)
 
   const featuredEvent = {
     id: "1",
@@ -195,7 +198,10 @@ export default function Home() {
               <Tab.Panels>
                 <Tab.Panel>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {events.map((event) => (
+                    {/* {events.map((event) => (
+                      <EventCard key={event.id} event={event} />
+                    ))} */}
+                    {eventsData && eventsData.results.map((event:any) => (
                       <EventCard key={event.id} event={event} />
                     ))}
                   </div>

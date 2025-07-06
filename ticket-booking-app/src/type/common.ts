@@ -1,4 +1,5 @@
 export interface DecodedData {
+    pk: number;
     username: string;
     email: string;
     first_name: string;

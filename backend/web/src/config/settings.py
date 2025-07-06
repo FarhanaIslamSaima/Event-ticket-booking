@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from corsheaders.defaults import default_headers
 from dotenv import read_dotenv
+import cloudinary_storage 
 
 # Load environment variables from .env file
 read_dotenv()
@@ -45,6 +46,8 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "dj_rest_auth",
     "dj_rest_auth.registration",
+    "cloudinary",
+    "cloudinary_storage",
     # Local apps
     "project.core",
     "project.authentication",
@@ -75,7 +78,12 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
     'accepts',  # This is the missing header causing your issue
 ]
-
+CLOUDINARY_STORAGE={
+    'CLOUD_NAME': os.getenv("CLOUDINARY_CLOUD_NAME"),
+    'API_KEY': os.getenv("CLOUDINARY_API_KEY"),
+    'API_SECRET': os.getenv("CLOUDINARY_API_SECRET"),
+}
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # Allow all HTTP methods
 CORS_ALLOW_METHODS = [
     'DELETE',

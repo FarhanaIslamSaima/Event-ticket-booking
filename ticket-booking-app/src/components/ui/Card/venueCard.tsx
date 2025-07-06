@@ -1,6 +1,10 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button as button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "react-day-picker"
+import { Plus } from "lucide-react"
+import Link from "next/link"
 import {
   MapPin,
   Users,
@@ -16,6 +20,7 @@ import {
   Filter,
   X,
 } from "lucide-react"
+
 interface Venue {
   id: string | number
   name: string
@@ -101,7 +106,16 @@ const venueCard = ({ venue }: { venue: Venue }) => {
         <div className="flex items-center space-x-3 pt-2 border-t border-gray-100">
           <Calendar className="h-4 w-4 text-gray-500" />
           <span className="text-xs text-gray-500">Added {formatDate(venue.created_at)}</span>
+          
         </div>
+        { venue.is_active &&
+         <Link href={`/events/create?id=${venue.id}`} className="" > <button
+           className="text-sm bg-blue-500 py-2 px-2 mt-2 text-white rounded-lg flex items-center gap-2"
+         >
+        
+          <Calendar className="text-sm"></Calendar>Add Event
+        </button></Link>
+}
       </CardContent>
     </Card>
   )

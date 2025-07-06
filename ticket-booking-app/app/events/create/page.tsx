@@ -1,18 +1,75 @@
 "use client";
-import React from 'react';
+import React,{useEffect} from 'react';
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { eventValidationSchema, defaultEventValues } from '@/validation/eventValidation';
+import { eventValidationSchema } from '@/validation/eventValidation';
 import ReUseForm from '@/components/Form/ReForm';
 import ReUseInput from '@/components/Form/ReInput';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, MapPin, Users, DollarSign, Image, FileText, Settings, User } from 'lucide-react';
+import { CalendarDays, MapPin, Users, DollarSign, Image, FileText, Settings, User, CodeSquare } from 'lucide-react';
+import { useGetCategoriesQuery } from '@/redux/api/categoryApi';
+import { ReUseUpload } from '@/components/Form/ReUpload';
+import ReUseSelect from '@/components/Form/ReSelect';
+import { useSearchParams } from 'next/navigation';
+import { useCreateEventMutation } from '@/redux/api/eventApi';
+import { getUserProfile } from '@/service/actions/authService';
+import { toast } from 'react-toastify';
 
+import { useParams } from 'next/navigation';
+import { useGetAllVenueQuery } from '@/redux/api/venueApi';
 const EventCreate = () => {
-    const handleEventSubmit = (data: any) => {
+  
+    const formatDate = (date: Date) => date.toISOString().split("T")[0]; // "yyyy-MM-dd"
+
+ const defaultEventValues = {
+  title: "",
+  description: "",
+  category_id: "",
+  venue_id: "",
+
+  event_date: formatDate(new Date()),
+  end_date: formatDate(new Date()),
+  total_tickets: 1,
+  available_tickets: 0,
+  base_price: 0.0,
+  status: "",
+  terms_conditions: "",
+  image: null, // or empty string if you want to handle it as text
+
+};
+    const [createEvent] = useCreateEventMutation();
+      const searchParams = useSearchParams();
+      const id = searchParams.get("id");
+    console.log("Event Create Page ID:", id);
+      const query = {
+        // Assuming you want to filter active categories
+    };
+     const query2: Record<string, any> = {
+        id: 1 // Convert to number if id is present
+    }
+
+  
+    const { data: venue, isLoading: venueLoading, isError: venueError } = useGetAllVenueQuery(query2);
+    console.log("Venue Data:", venue?.venues[0].name
+    );
+
+    const { data: categories, isLoading: categoriesLoading, isError: categoriesError } = useGetCategoriesQuery(query);
+    console.log("Categories Data:", categories?.results);
+
+    const handleEventSubmit = async (data: any) => {
         console.log("Event Data Submitted:", data);
+        console.log("hello world");
+        const result=await createEvent(data).unwrap();
+          if (result?.id) {
+                    toast.success("Event created successfully!");
+                    window.location.href = `/`; // Redirect to the newly created event page
+                    // Redirect to the newly created event page
+                } else {
+                    toast.error("Failed to create venue. Please try again.");
+                }
+        console.log("Event Creation Result:", result);
     }
 
     return (
@@ -63,7 +120,7 @@ const EventCreate = () => {
                                     <div className="md:col-span-2">
                                         <ReUseInput name="description" label="Event Description" />
                                     </div>
-                                    <ReUseInput name="category" label="Event Category" />
+                                    <ReUseSelect name="category_id" label="Event Category" options={categories?.results || []} />
                                     <ReUseInput name="status" label="Status" />
                                 </div>
                             </div>
@@ -78,8 +135,10 @@ const EventCreate = () => {
                                 </div>
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <ReUseInput name="venue" label="Event Venue" />
-                                    <ReUseInput name="organizer" label="Event Organizer" />
+                                     <ReUseSelect name="venue_id" label="Venue" options={venue?.venues || []} />
+                                  
+                                    
+
                                 </div>
                             </div>
 
@@ -93,8 +152,8 @@ const EventCreate = () => {
                                 </div>
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <ReUseInput name="event_date" label="Event Date" />
-                                    <ReUseInput name="end_date" label="End Date" />
+                                    <ReUseInput name="event_date" label="Event Date" type='date'/>
+                                    <ReUseInput name="end_date" label="End Date" type='date' />
                                 </div>
                             </div>
 
@@ -124,7 +183,7 @@ const EventCreate = () => {
                                 </div>
                                 
                                 <div className="space-y-6">
-                                    <ReUseInput name="image_url" label="Event Image URL" />
+                                    <ReUseUpload name="image" label="Event Image" sx={{ width: '100%' }} />
                                     <ReUseInput name="terms_conditions" label="Terms and Conditions" />
                                 </div>
                             </div>

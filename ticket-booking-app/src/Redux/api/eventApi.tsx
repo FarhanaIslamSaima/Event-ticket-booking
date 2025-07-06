@@ -6,7 +6,7 @@ const eventApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getEvents: builder.query({
       query: () => ({
-      url:"/events",
+      url:"/events/",
       method: "GET",
       providesTags: [tagTypes.event],
       })
@@ -14,9 +14,10 @@ const eventApi = baseApi.injectEndpoints({
     createEvent: builder.mutation({
       query: (data) => ({
       
-        url: "/events",
+        url: "/events/",
         method: "POST",
-        body: data,
+        data: data,
+        contentType: "multipart/form-data",
       }),
       invalidatesTags: [tagTypes.event],
     }),

@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from cloudinary.models import CloudinaryField
 class Event(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
@@ -14,6 +15,7 @@ class Event(models.Model):
     status = models.CharField(max_length=50)
     terms_conditions = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    image = CloudinaryField('image', blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):

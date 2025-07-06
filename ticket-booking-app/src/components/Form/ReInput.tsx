@@ -9,6 +9,7 @@ type Tcontroller = {
     size?: "small" | 'medium';
     fullWidth?: boolean;
     required?: boolean;
+    value?: string | number;
 }
 
 const ReUseInput = ({ name, type = 'text', size = 'small', fullWidth = true, label, required }: Tcontroller) => {
@@ -24,6 +25,7 @@ const ReUseInput = ({ name, type = 'text', size = 'small', fullWidth = true, lab
                     type={type}
                     variant="outlined"
                     size={size}
+                    value={field.value || ''} // Ensure value is always a string
                     fullWidth={fullWidth}
                     required={required}
                     error={!!error?.message}
