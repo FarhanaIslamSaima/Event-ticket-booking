@@ -12,13 +12,17 @@ interface EventProps {
     },
     image_url: string
     base_price: string
-    category?: string
+    category:{
+      id: string
+      name: string
+    }
   }
 }
 
 export default function EventCard({ event }: EventProps) {
+  console.log("Event Card:", event.category.id)
   return (
-    <Link href={`/events/${event.id}`} className="group">
+    <Link href={`/events?id=${event.id}`} className="group">
       <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
         <div className="relative h-48">
           <Image src={event.image_url || "/placeholder.svg"} alt={event.title} fill className="object-cover" />
@@ -33,7 +37,7 @@ export default function EventCard({ event }: EventProps) {
           </div>
           <div className="flex items-center mt-1 text-gray-600">
             <MapPin className="h-4 w-4 mr-1" />
-            <span className="text-sm">{event.venue.name}</span>
+            <span className="text-sm">{event.venue?.name}</span>
           </div>
           <div className="mt-3 flex justify-between items-center">
             <span className="font-semibold text-purple-700">From {event.base_price}$</span>

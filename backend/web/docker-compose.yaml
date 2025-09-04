@@ -35,6 +35,19 @@ services:
       volumes:
         - redis_data:/data
       entrypoint: redis-server --appendonly yes --port 6380
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    restart: always
 volumes:
   postgres_data:
   redis_data:
+  elasticsearch_data:

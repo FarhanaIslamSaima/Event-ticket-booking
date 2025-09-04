@@ -1,9 +1,11 @@
+
 import type { Metadata } from 'next'
 import './globals.css'
 import { ToastContainer, toast } from 'react-toastify';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import Providers from '@/lib/Providers/Provider';
+import ClientWrapper from './ClientWrapper';
 export const metadata: Metadata = {
   title: 'v0 App',
   description: 'Created with v0',
@@ -18,12 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Providers>
-          <ToastContainer/>
-          <Header />
+        <ClientWrapper>
           {children}
-          <Footer />
-        </Providers>
+        </ClientWrapper>
       </body>
     </html>
   )

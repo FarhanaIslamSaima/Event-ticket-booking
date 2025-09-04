@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     'allauth.socialaccount.providers.google',
     # Third-party apps
+    "django_elasticsearch_dsl",
     "corsheaders",
     "django_filters",
     "drf_spectacular",
@@ -82,6 +83,11 @@ CLOUDINARY_STORAGE={
     'CLOUD_NAME': os.getenv("CLOUDINARY_CLOUD_NAME"),
     'API_KEY': os.getenv("CLOUDINARY_API_KEY"),
     'API_SECRET': os.getenv("CLOUDINARY_API_SECRET"),
+}
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'http://127.0.0.1:9200'  # Use the Docker service name!
+    },
 }
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # Allow all HTTP methods

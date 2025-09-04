@@ -56,6 +56,7 @@ class VenueListCreateAPIView(generics.ListCreateAPIView):
         return queryset
     
     def list(self, request, *args, **kwargs):
+        
         queryset = self.filter_queryset(self.get_queryset())
         
         # Get pagination parameters
@@ -87,9 +88,46 @@ class VenueListCreateAPIView(generics.ListCreateAPIView):
 
 # Create your views here.
 class EventListCreateAPIView(generics.ListCreateAPIView):
+
+    def get_queryset(self):
+        id= self.request.query_params.get('id')
+        if id is not None:
+            try:
+                return Event.objects.filter(id=int(id))
+            except ValueError:
+                return Event.objects.none()
+        queryset = Event.objects.all()
+        
+        # Filter by category
+        category_id = self.request.query_params.get('category')
+        if category_id is not None:
+            try:
+                queryset = queryset.filter(category__id=int(category_id))
+            except ValueError:
+                queryset = queryset.none()
+        
+        # Filter by venue
+        venue_id = self.request.query_params.get('venue')
+        if venue_id is not None:
+            try:
+                queryset = queryset.filter(venue__id=int(venue_id))
+            except ValueError:
+                queryset = queryset.none()
+        
+        # Date range filtering
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
+        
+        if start_date:
+            queryset = queryset.filter(date__gte=start_date)
+        if end_date:
+            queryset = queryset.filter(date__lte=end_date)
+        
+        return queryset
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     permission_classes = [permissions.AllowAny]
+
     def perform_create(self, serializer):
         # Automatically set the organizer to the current user
         serializer.save(organizer=self.request.user)

@@ -9,11 +9,17 @@ import FeaturedEvent from "@/components/featured-event"
 import Header from "@/components/header" // Correct case: lowercase 'h'
 import Footer from "@/components/footer"
 import {useGetEventsQuery } from "@/redux/api/eventApi"
+import {useGetCategoriesQuery} from "@/redux/api/categoryApi"
+import { on } from "events"
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("")
   const { data: eventsData, isLoading, error } = useGetEventsQuery()
+  const { data: categories } = useGetCategoriesQuery()
+  const [category, setCategory] = useState(0)
+  console.log("category:", category)
   console.log("Events Data:", eventsData)
+  console.log("Categories Data:", categories)
 
   const featuredEvent = {
     id: "1",
@@ -24,63 +30,23 @@ export default function Home() {
     price: "From $99",
   }
 
-  const events = [
-    {
-      id: "2",
-      title: "NBA Finals 2024",
-      date: "Thu, Jun 20, 2024 • 6:30 PM",
-      location: "Madison Square Garden, New York",
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      price: "From $120",
-      category: "sports",
-    },
-    {
-      id: "3",
-      title: "Coldplay World Tour",
-      date: "Fri, Jul 5, 2024 • 8:00 PM",
-      location: "Wembley Stadium, London",
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      price: "From $85",
-      category: "concerts",
-    },
-    {
-      id: "4",
-      title: "Hamilton - Broadway Musical",
-      date: "Multiple Dates",
-      location: "Richard Rodgers Theatre, New York",
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      price: "From $199",
-      category: "theater",
-    },
-    {
-      id: "5",
-      title: "Comic Con 2024",
-      date: "Jul 25-28, 2024",
-      location: "San Diego Convention Center",
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      price: "From $65",
-      category: "conventions",
-    },
-    {
-      id: "6",
-      title: "UFC 300",
-      date: "Sat, Aug 10, 2024 • 7:00 PM",
-      location: "T-Mobile Arena, Las Vegas",
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      price: "From $225",
-      category: "sports",
-    },
-    {
-      id: "7",
-      title: "Adele Residency",
-      date: "Multiple Dates",
-      location: "Caesars Palace, Las Vegas",
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      price: "From $250",
-      category: "concerts",
-    },
-  ]
 
+interface EventProps {
+  event: {
+    id: string
+    title: string
+    event_date: string
+    venue: {
+      name: string
+    },
+    image_url: string
+    base_price: string
+    category:{
+      id: string
+      name: string
+    }
+  }
+}
   return (
     <div className="min-h-screen flex flex-col">
     
@@ -141,108 +107,55 @@ export default function Home() {
                       ? "bg-white shadow text-purple-700"
                       : "text-gray-700 hover:bg-white/[0.12] hover:text-purple-600"
                   }`
+
                   }
                 >
                   All Events
-                </Tab>
-                <Tab
-                  className={({ selected }) =>
-                    `w-full rounded-lg py-2.5 text-sm font-medium leading-5 
-                  ${
-                    selected
-                      ? "bg-white shadow text-purple-700"
-                      : "text-gray-700 hover:bg-white/[0.12] hover:text-purple-600"
-                  }`
-                  }
-                >
-                  Concerts
-                </Tab>
-                <Tab
-                  className={({ selected }) =>
-                    `w-full rounded-lg py-2.5 text-sm font-medium leading-5 
-                  ${
-                    selected
-                      ? "bg-white shadow text-purple-700"
-                      : "text-gray-700 hover:bg-white/[0.12] hover:text-purple-600"
-                  }`
-                  }
-                >
-                  Sports
-                </Tab>
-                <Tab
-                  className={({ selected }) =>
-                    `w-full rounded-lg py-2.5 text-sm font-medium leading-5 
-                  ${
-                    selected
-                      ? "bg-white shadow text-purple-700"
-                      : "text-gray-700 hover:bg-white/[0.12] hover:text-purple-600"
-                  }`
-                  }
-                >
-                  Theater
-                </Tab>
-                <Tab
-                  className={({ selected }) =>
-                    `w-full rounded-lg py-2.5 text-sm font-medium leading-5 
-                  ${
-                    selected
-                      ? "bg-white shadow text-purple-700"
-                      : "text-gray-700 hover:bg-white/[0.12] hover:text-purple-600"
-                  }`
-                  }
-                >
-                  More
-                </Tab>
+                </Tab>{
+                  categories && categories.results.map((category:any) => (
+                    <Tab
+                      key={category.id}
+                      className={({ selected }) =>
+                        `w-full rounded-lg py-2.5 text-sm font-medium leading-5 
+                      ${
+                        selected
+                          ? "bg-white shadow text-purple-700"
+                          : "text-gray-700 hover:bg-white/[0.12] hover:text-purple-600"
+                      }`
+                      }
+                      onClick={() => setCategory(category.id)}
+
+                    >
+                      {category.name}
+                    </Tab>
+                  ))
+                }
+                
+             
               </Tab.List>
 
-              <Tab.Panels>
-                <Tab.Panel>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {/* {events.map((event) => (
-                      <EventCard key={event.id} event={event} />
-                    ))} */}
-                    {eventsData && eventsData.results.map((event:any) => (
-                      <EventCard key={event.id} event={event} />
-                    ))}
-                  </div>
-                </Tab.Panel>
-                <Tab.Panel>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {events
-                      .filter((event) => event.category === "concerts")
-                      .map((event) => (
-                        <EventCard key={event.id} event={event} />
-                      ))}
-                  </div>
-                </Tab.Panel>
-                <Tab.Panel>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {events
-                      .filter((event) => event.category === "sports")
-                      .map((event) => (
-                        <EventCard key={event.id} event={event} />
-                      ))}
-                  </div>
-                </Tab.Panel>
-                <Tab.Panel>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {events
-                      .filter((event) => event.category === "theater")
-                      .map((event) => (
-                        <EventCard key={event.id} event={event} />
-                      ))}
-                  </div>
-                </Tab.Panel>
-                <Tab.Panel>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {events
-                      .filter((event) => !["concerts", "sports", "theater"].includes(event.category))
-                      .map((event) => (
-                        <EventCard key={event.id} event={event} />
-                      ))}
-                  </div>
-                </Tab.Panel>
-              </Tab.Panels>
+             <Tab.Panels>
+  {/* All Events Panel */}
+  <Tab.Panel key="all">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {eventsData?.map((event: any) => (
+        <EventCard key={event.id} event={event} />
+      ))}
+    </div>
+  </Tab.Panel>
+
+  {/* Category Panels */}
+  {categories?.results.map((cat: any) => (
+    <Tab.Panel key={cat.id}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {eventsData?.filter((event: any) => event.category.id === cat.id).map((event: any) => (
+          <EventCard key={event.id} event={event} />
+        ))}
+      </div>
+    </Tab.Panel>
+  ))}
+</Tab.Panels>
+
             </Tab.Group>
           </div>
         </section>
