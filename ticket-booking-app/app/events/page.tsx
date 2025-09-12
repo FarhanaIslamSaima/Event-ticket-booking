@@ -1,7 +1,10 @@
 "use client"
 
 import type React from "react"
-
+import ReUseForm from '@/components/Form/ReForm';
+import ReUseInput from '@/components/Form/ReInput';
+import { zodResolver } from "@hookform/resolvers/zod";
+import ReUseSelect from '@/components/Form/ReSelect';
 import { useState } from "react"
 import { CalendarDays, Clock, MapPin, Share, Heart, Info, ChevronDown, ChevronUp } from "lucide-react"
 import { Disclosure } from "@headlessui/react"
@@ -11,8 +14,12 @@ import Footer from "@/components/footer"
 import SeatSelection from "@/components/seat-selection"
 import { useGetEventsQuery } from "@/redux/api/eventApi"
 import { useSearchParams } from "next/navigation";
-
+import { defaultOrderValues } from "@/validation/orderValidation"
+import { orderValidationSchema } from "@/validation/orderValidation"
+import { useCreateOrderMutation } from "@/redux/api/orderApi"
 export default function EventDetails() {
+  const [createOrder] = useCreateOrderMutation();
+
     const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -61,6 +68,26 @@ export default function EventDetails() {
   const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setQuantity(Number.parseInt(e.target.value))
   }
+
+ const handleOrderSubmit = async (data: any) => {
+ 
+  console.log("Order Form submitted with data:", data);
+ 
+
+
+    const res = await createOrder(data).unwrap();
+    console.log("Response from createOrder:", res);
+    if (res?.id) {
+      // Redirect to the newly created order page
+      alert("Order created successfully!");
+      window.location.href = `/checkout?id=${res.id}`;
+    }
+    else {
+      alert("Failed to create order. Please try again.");
+    }
+
+  };
+
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -169,7 +196,13 @@ export default function EventDetails() {
             <div className="mt-10 lg:mt-0">
               <div className="bg-white rounded-lg shadow-lg p-6 sticky top-8">
                 <h3 className="text-xl font-bold mb-6">Select Tickets</h3>
-
+                
+                 <ReUseForm
+                  defaultValues={{ ...defaultOrderValues, event_id: eventId ? parseInt(eventId) : 1 }}
+                  onSubmit={handleOrderSubmit} 
+                  resolver={zodResolver(orderValidationSchema)}
+                 
+                 >
                 <div className="space-y-4 mb-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
@@ -202,21 +235,23 @@ export default function EventDetails() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-                    <select
-                      className="w-full border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                      value={quantity}
-                      onChange={handleQuantityChange}
-                    >
-                      {Array.from({ length: event.maxQuantity }, (_, i) => i + 1).map((num) => (
-                        <option key={num} value={num}>
-                          {num}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                   
+                  
+                                      <ReUseSelect 
+                    name="number_of_tickets" 
+                    label="number_of_tickets" 
+                 
+                    options={[{
+                        name: '1',
+                        id: 1}]}
+                  >
+                    
+                  </ReUseSelect>
+                                    </div>
                 </div>
 
+                
+          
                 <div className="border-t border-gray-200 pt-4 mb-6">
                   <div className="flex justify-between mb-2">
                     <span className="text-gray-600">Price per ticket</span>
@@ -224,6 +259,7 @@ export default function EventDetails() {
                   </div>
                   <div className="flex justify-between mb-2">
                     <span className="text-gray-600">Quantity</span>
+                 
                     <span>{quantity}</span>
                   </div>
                   <div className="flex justify-between mb-2">
@@ -240,9 +276,10 @@ export default function EventDetails() {
                   </div>
                 </div>
 
-                <button className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200">
+                <button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200">
                   Proceed to Checkout
                 </button>
+                </ReUseForm>
 
                 <div className="mt-4 flex items-center justify-center text-sm text-gray-500">
                   <Info className="h-4 w-4 mr-1" />

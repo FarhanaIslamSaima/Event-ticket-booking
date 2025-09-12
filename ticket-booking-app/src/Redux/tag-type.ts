@@ -3,7 +3,9 @@ export enum tagTypes {
   booking = 'booking',
   user = 'user',           // if you show user profile, list, etc.
   venue = 'venue',         // if events are associated with venues
-  category = 'category'    // optional: if events are categorized
+  category = 'category',
+  payment = 'payment',
+  order = 'order'    // optional: if events are categorized
 }
 
 export const tagTypesList = [
@@ -11,5 +13,7 @@ export const tagTypesList = [
   tagTypes.booking,
   tagTypes.user,
   tagTypes.venue,
-  tagTypes.category
+  tagTypes.category,
+  tagTypes.payment,
+  tagTypes.order
 ];

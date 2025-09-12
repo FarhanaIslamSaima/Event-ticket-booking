@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.conf import settings
 from cloudinary.models import CloudinaryField
@@ -46,3 +47,14 @@ class Venue(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Order(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    event = models.ForeignKey('Event', on_delete=models.CASCADE)
+    number_of_tickets = models.PositiveIntegerField()
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.event.title}"

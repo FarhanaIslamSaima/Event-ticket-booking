@@ -22,14 +22,10 @@ urlpatterns = [
     path("api/v1/", include("project.core.urls")),
     path("api/v1/", include("project.event.urls")),
     path('accounts/', include('allauth.urls')),
+    path('api/v1/payment/',include('project.payment.urls')),  # ADD THIS LINE
 ]
 
 # ADD THIS LINE - This is what's missing!
 
-
-# Serve media files in development
-print("this is debug info", settings.DEBUG)
-if settings.DEBUG:
-
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

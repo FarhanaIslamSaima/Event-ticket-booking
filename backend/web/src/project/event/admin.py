@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Venue, Event
+from .models import Category, Order, Venue, Event
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -21,3 +21,10 @@ class EventAdmin(admin.ModelAdmin):
     search_fields = ('title', 'description')
     list_filter = ('status', 'event_date', 'venue', 'category')
     ordering = ('-event_date',)
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'event', 'number_of_tickets', 'total_amount', 'created_at')
+    list_filter = ('event', 'created_at', 'user')
+    search_fields = ('user__username', 'event__title', 'user__email')
+    readonly_fields = ('created_at', 'total_amount')

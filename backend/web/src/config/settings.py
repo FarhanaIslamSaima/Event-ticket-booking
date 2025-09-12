@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     # Local apps
     "project.core",
     "project.authentication",
-    "project.event"
+    "project.event",
+    "project.payment",
 ]
 
 MIDDLEWARE = [
@@ -89,6 +90,11 @@ ELASTICSEARCH_DSL = {
         'hosts': 'http://127.0.0.1:9200'  # Use the Docker service name!
     },
 }
+# SSLCommerz settings
+SSLCZ_STORE_ID = os.environ.get("SSLCZ_STORE_ID")
+SSLCZ_STORE_PASS = os.environ.get("SSLCZ_STORE_PASS")
+SSLCZ_IS_SANDBOX = os.environ.get("SSLCZ_IS_SANDBOX")
+
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # Allow all HTTP methods
 CORS_ALLOW_METHODS = [

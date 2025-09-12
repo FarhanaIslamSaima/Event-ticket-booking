@@ -1,7 +1,9 @@
 from rest_framework import serializers
-from project.event.models import Event, Category, Venue
+from project.event.models import Event, Category, Venue, Order
 
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 
 
@@ -42,3 +44,27 @@ class EventSerializer(serializers.ModelSerializer):
             'organizer', 'organizer_id'
         ]
         read_only_fields = ['organizer', 'category', 'venue', 'created_at', 'updated_at']
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']  # Add more fields if you want
+
+class OrderSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)       # nested user info
+    event = EventSerializer(read_only=True)     # nested event info
+    event_id = serializers.PrimaryKeyRelatedField(
+        queryset=Event.objects.all(), source='event', write_only=True
+    )
+
+    class Meta:
+        model = Order
+        fields = ['id', 'user', 'event', 'event_id', 'number_of_tickets', 'total_amount', 'created_at']
+        read_only_fields = ['created_at', 'total_amount', 'user', 'event']
+
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        event = validated_data['event']
+        number_of_tickets = validated_data['number_of_tickets']
+        validated_data['total_amount'] = number_of_tickets * event.base_price
+        return super().create(validated_data)

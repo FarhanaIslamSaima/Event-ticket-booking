@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework import generics,permissions
 from rest_framework.response import Response
-from .models import Event, Category, Venue
-from .serializers import EventSerializer, CategorySerializer, VenueSerializer
+from .models import Event, Category, Venue, Order
+from .serializers import EventSerializer, CategorySerializer, VenueSerializer, OrderSerializer
 
 
 class VenueListCreateAPIView(generics.ListCreateAPIView):
@@ -135,4 +135,19 @@ class EventListCreateAPIView(generics.ListCreateAPIView):
 class CategoryListAPIView(generics.ListAPIView):
     queryset=Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [permissions.AllowAny]  # 👈 This makes it public
+    permission_classes = [permissions.AllowAny]  
+
+
+class OrderListCreateView(generics.ListCreateAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated]  # user must be logged in
+
+    def get_queryset(self):
+        order_id = self.request.query_params.get('id')
+        if order_id is not None:
+            try:
+                return Order.objects.filter(id=int(order_id), user=self.request.user)
+            except ValueError:
+                return Order.objects.none()
+        # Return all orders of the current user by default
+        return Order.objects.filter(user=self.request.user)
