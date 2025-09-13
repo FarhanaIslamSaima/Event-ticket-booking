@@ -1,10 +1,35 @@
+"use client"
 import { Download, QrCode, Share, Ticket } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
+import { useSearchParams } from "next/navigation"
+import { useGetOrdersQuery } from "@/redux/api/orderApi"
 
 export default function MyTickets() {
+  const searchParams = useSearchParams()
+ 
+  const query = { status:"paid" }
+  const { data: orders, isLoading } = useGetOrdersQuery(query)
+  console.log("Orders data:", orders)
+   const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const formattedTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    });
+  };
+  if (isLoading) return <p className="text-center mt-10">Loading...</p>
   const tickets = [
     {
       id: "1",
@@ -46,7 +71,7 @@ export default function MyTickets() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+ 
 
       <main className="flex-1 bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -63,41 +88,34 @@ export default function MyTickets() {
           </div>
 
           <div className="grid gap-6">
-            {tickets.map((ticket) => (
+            {orders?.map((ticket:any) => (
               <div key={ticket.id} className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="md:flex">
                   <div className="md:w-1/4 relative h-48 md:h-auto">
                     <Image
-                      src={ticket.imageUrl || "/placeholder.svg"}
-                      alt={ticket.eventName}
+                      src={ticket.event.image_url || "/placeholder.svg"}
+                      alt={"alt text"}
                       fill
                       className="object-cover"
                     />
                   </div>
 
                   <div className="p-6 md:w-2/4 border-r border-gray-200">
-                    <h2 className="text-xl font-bold mb-2">{ticket.eventName}</h2>
+                    <h2 className="text-xl font-bold mb-2">{ticket.event.title}</h2>
                     <div className="text-gray-600 mb-4">
                       <div>
-                        {ticket.date} • {ticket.time}
+                        {formatDate(ticket.event.event_date)} • {formattedTime(ticket.event.event_date)}
                       </div>
-                      <div>{ticket.venue}</div>
-                      <div>{ticket.location}</div>
+                      <div>{ticket.event.venue.name}</div>
+                      <div>{ticket.event.venue.address}</div>
                     </div>
 
                     <div className="bg-gray-50 rounded-md p-3 mb-4">
                       <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <div className="text-sm text-gray-500">Section</div>
-                          <div className="font-medium">{ticket.section}</div>
-                        </div>
-                        <div>
-                          <div className="text-sm text-gray-500">Seat</div>
-                          <div className="font-medium">{ticket.seat}</div>
-                        </div>
+                       
                         <div className="col-span-2">
                           <div className="text-sm text-gray-500">Ticket Code</div>
-                          <div className="font-medium">{ticket.ticketCode}</div>
+                          <div className="font-medium">{ticket.tran_id}</div>
                         </div>
                       </div>
                     </div>
@@ -118,14 +136,7 @@ export default function MyTickets() {
                     </div>
                   </div>
 
-                  <div className="p-6 md:w-1/4 flex flex-col items-center justify-center">
-                    <div className="bg-white p-2 rounded-lg border border-gray-200 mb-4">
-                      <QrCode className="h-32 w-32" />
-                    </div>
-                    <button className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-md font-medium transition-colors duration-200">
-                      Add to Wallet
-                    </button>
-                  </div>
+               
                 </div>
               </div>
             ))}
@@ -133,7 +144,6 @@ export default function MyTickets() {
         </div>
       </main>
 
-      <Footer />
     </div>
   )
 }

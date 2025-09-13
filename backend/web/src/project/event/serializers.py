@@ -1,3 +1,4 @@
+import uuid
 from rest_framework import serializers
 from project.event.models import Event, Category, Venue, Order
 
@@ -59,12 +60,27 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'event', 'event_id', 'number_of_tickets', 'total_amount', 'created_at']
-        read_only_fields = ['created_at', 'total_amount', 'user', 'event']
+        fields = [
+            'id',
+            'user',
+            'event',
+            'event_id',
+            'number_of_tickets',
+            'total_amount',
+            'status',      # ✅ added status field
+            'tran_id',     # ✅ added tran_id field
+            'created_at'
+        ]
+        read_only_fields = ['created_at', 'total_amount', 'user', 'event', 'status', 'tran_id']
 
     def create(self, validated_data):
-        validated_data['user'] = self.context['request'].user
+        user = self.context['request'].user
         event = validated_data['event']
         number_of_tickets = validated_data['number_of_tickets']
+
+        validated_data['user'] = user
         validated_data['total_amount'] = number_of_tickets * event.base_price
+        validated_data['status'] = 'due'          # ✅ set default status to due
+        validated_data['tran_id'] = str(uuid.uuid4())  # ✅ generate unique transaction id
+
         return super().create(validated_data)

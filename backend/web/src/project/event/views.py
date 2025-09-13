@@ -144,10 +144,19 @@ class OrderListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         order_id = self.request.query_params.get('id')
+        
         if order_id is not None:
             try:
                 return Order.objects.filter(id=int(order_id), user=self.request.user)
             except ValueError:
                 return Order.objects.none()
         # Return all orders of the current user by default
+        status=self.request.query_params.get('status')
+        if status is not None:
+            try:
+                 return Order.objects.filter(user=self.request.user, status=status)
+            except ValueError:
+                return Order.objects.none()
+           
+        
         return Order.objects.filter(user=self.request.user)

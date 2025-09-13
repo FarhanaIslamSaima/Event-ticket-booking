@@ -3,55 +3,80 @@ from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from sslcommerz_lib import SSLCOMMERZ
-
+from project.event.models import Order
 from rest_framework.permissions import AllowAny
+from django.shortcuts import redirect
+
 class InitiatePayment(APIView):
-    """
-    Start a payment and return the SSLCommerz gateway URL
-    """
-    permission_classes = [AllowAny] 
+    permission_classes = [AllowAny]
+
     def post(self, request):
         # 🔹 credentials from settings
         settings_dict = {
             'store_id': settings.SSLCZ_STORE_ID,
             'store_pass': settings.SSLCZ_STORE_PASS,
-            'issandbox': settings.SSLCZ_IS_SANDBOX
+            'issandbox':  settings.SSLCZ_IS_SANDBOX
         }
 
         sslcz = SSLCOMMERZ(settings_dict)
 
-        # unique transaction id
-        tran_id = str(uuid.uuid4())
+        # 🔹 Create an order first
+        order = Order.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            event_id=request.data.get("event_id"),
+            number_of_tickets=request.data.get("number_of_tickets", 1),
+            total_amount=request.data.get("amount", 1000),
+        )
 
         post_body = {
-        'total_amount': request.data.get("amount", 1000),
-        'currency': "BDT",
-        'tran_id': tran_id,
-        'success_url': "http://localhost:8000/api/payments/success/",
-        'fail_url': "http://localhost:8000/api/payments/fail/",
-        'cancel_url': "http://localhost:8000/api/payments/cancel/",
-        'emi_option': 0,
-        'cus_name': request.data.get("name", "Guest"),
-        'cus_email': request.data.get("email", "guest@example.com"),
-        'cus_phone': "01700000000",   # ✅ fixed default phone
-        'cus_add1': "Dhaka",
-        'cus_city': "Dhaka",
-        'cus_country': "Bangladesh",
-        'shipping_method': "NO",
-        'product_name': "Test Product",
-        'product_category': "Test Category",
-        'product_profile': "general"
-    }
-
+            'total_amount': order.total_amount,
+            'currency': "BDT",
+            'tran_id': str(order.tran_id),  # use Order tran_id
+            'success_url': f"http://localhost:8000/api/v1/payment/success/{order.tran_id}/",
+            'fail_url': f"http://localhost:8000/api/v1/payment/fail/{order.tran_id}/",
+            'cancel_url': f"http://localhost:8000/api/v1/payment/cancel/{order.tran_id}/",
+            'emi_option': 0,
+            'cus_name': request.data.get("name", "Guest"),
+            'cus_email': request.data.get("email", "guest@example.com"),
+            "cus_phone": "0000000000",
+            'cus_add1': "Dhaka",
+            'cus_city': "Dhaka",
+            'cus_country': "Bangladesh",
+            'shipping_method': "NO",
+            'product_name': "Event Tickets",
+            'product_category': "Tickets",
+            'product_profile': "general"
+        }
 
         response = sslcz.createSession(post_body)
+        print(response)
 
-        return Response(response)
-
+        return Response({
+            "gateway_url": response.get("GatewayPageURL"),
+            "tran_id": order.tran_id
+        })
 
 class PaymentSuccess(APIView):
-    def post(self, request):
-        return Response({"status": "success", "data": request.data})
+    permission_classes = [AllowAny]
+
+    def post(self, request, tran_id=None):
+        """
+        If frontend posts tran_id in body, use that.
+        Or if using URL param (recommended), use tran_id from URL.
+        """
+
+        tran_id = tran_id or request.data.get("tran_id")
+        if not tran_id:
+            return Response({"status": "error", "message": "Transaction ID missing"}, status=400)
+
+        try:
+            order = Order.objects.get(tran_id=tran_id)
+            order.status = "paid"
+            order.save()
+            # Redirect frontend after updating DB
+            return redirect(f"http://localhost:3000/payment/payment-success?tran_id={tran_id}")
+        except Order.DoesNotExist:
+            return Response({"status": "error", "message": "Order not found"}, status=404)
 
 
 class PaymentFail(APIView):

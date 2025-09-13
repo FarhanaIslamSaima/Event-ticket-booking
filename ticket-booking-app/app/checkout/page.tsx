@@ -18,6 +18,7 @@ export default function Checkout() {
   const { data: orders, isLoading } = useGetOrdersQuery(query)
 
   const defaultPaymentValues = {
+    event_id: orders?.event?.id,
     amount: orders?.total_amount || 0,
     name: orders?.user?.username || "",
     email: orders?.user?.email || "",
@@ -29,8 +30,8 @@ export default function Checkout() {
     const res = await initiatePayment(data).unwrap()
     console.log("Response from initiatePayment:", res)
 
-    if (res?.GatewayPageURL) {
-      window.location.href = res.GatewayPageURL
+    if (res?.gateway_url) {
+      window.location.href = res.gateway_url
     } else {
       alert("Failed to initiate payment. Please try again.")
     }
