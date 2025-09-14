@@ -2,6 +2,8 @@ import uuid
 from django.db import models
 from django.conf import settings
 from cloudinary.models import CloudinaryField
+from django.contrib.auth import get_user_model
+User = get_user_model()
 class Event(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
@@ -47,6 +49,7 @@ class Venue(models.Model):
 
     def __str__(self):
         return self.name
+
 
 
 class Order(models.Model):

@@ -1,5 +1,6 @@
 import uuid
 from django.conf import settings
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from sslcommerz_lib import SSLCOMMERZ
@@ -19,17 +20,24 @@ class InitiatePayment(APIView):
         }
 
         sslcz = SSLCOMMERZ(settings_dict)
+        id = request.data.get("id")
+        print(id)
+        
+        
 
-        # 🔹 Create an order first
-        order = Order.objects.create(
-            user=request.user if request.user.is_authenticated else None,
-            event_id=request.data.get("event_id"),
-            number_of_tickets=request.data.get("number_of_tickets", 1),
-            total_amount=request.data.get("amount", 1000),
+             # 🔹 Check if an unpaid order already exists
+        order = Order.objects.get(
+            id=id,
+
+            # assume default is due
         )
+       
+       
+      
+       
 
         post_body = {
-            'total_amount': order.total_amount,
+            'total_amount': 10,
             'currency': "BDT",
             'tran_id': str(order.tran_id),  # use Order tran_id
             'success_url': f"http://localhost:8000/api/v1/payment/success/{order.tran_id}/",
@@ -54,6 +62,7 @@ class InitiatePayment(APIView):
         return Response({
             "gateway_url": response.get("GatewayPageURL"),
             "tran_id": order.tran_id
+            
         })
 
 class PaymentSuccess(APIView):
@@ -74,6 +83,8 @@ class PaymentSuccess(APIView):
             order.status = "paid"
             order.save()
             # Redirect frontend after updating DB
+            print(order.status)
+
             return redirect(f"http://localhost:3000/payment/payment-success?tran_id={tran_id}")
         except Order.DoesNotExist:
             return Response({"status": "error", "message": "Order not found"}, status=404)

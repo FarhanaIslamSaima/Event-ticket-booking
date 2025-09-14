@@ -20,6 +20,13 @@ interface EventProps {
 }
 
 export default function EventCard({ event }: EventProps) {
+   const formatDate = (dateString: string) => {
+      return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    }
   console.log("Event Card:", event.category.id)
   return (
     <Link href={`/events?id=${event.id}`} className="group">
@@ -33,7 +40,7 @@ export default function EventCard({ event }: EventProps) {
           </h3>
           <div className="flex items-center mt-2 text-gray-600">
             <CalendarDays className="h-4 w-4 mr-1" />
-            <span className="text-sm">{event.event_date}</span>
+            <span className="text-sm">{formatDate(event.event_date)}</span>
           </div>
           <div className="flex items-center mt-1 text-gray-600">
             <MapPin className="h-4 w-4 mr-1" />

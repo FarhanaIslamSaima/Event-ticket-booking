@@ -22,7 +22,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-key-for-development-only")
 DEBUG = os.getenv("DEBUG")
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
-SITE_ID = 3
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     'allauth.socialaccount.providers.google',
     # Third-party apps
-    "django_elasticsearch_dsl",
+    # "django_elasticsearch_dsl",
     "corsheaders",
     "django_filters",
     "drf_spectacular",
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "dj_rest_auth.registration",
     "cloudinary",
     "cloudinary_storage",
+    'django_celery_beat',
     # Local apps
     "project.core",
     "project.authentication",
@@ -85,11 +86,11 @@ CLOUDINARY_STORAGE={
     'API_KEY': os.getenv("CLOUDINARY_API_KEY"),
     'API_SECRET': os.getenv("CLOUDINARY_API_SECRET"),
 }
-ELASTICSEARCH_DSL = {
-    'default': {
-        'hosts': 'http://127.0.0.1:9200'  # Use the Docker service name!
-    },
-}
+# ELASTICSEARCH_DSL = {
+#     'default': {
+#         # 'hosts': 'http://127.0.0.1:9200'  # Use the Docker service name!
+#     },
+# }
 # SSLCommerz settings
 SSLCZ_STORE_ID = os.environ.get("SSLCZ_STORE_ID")
 SSLCZ_STORE_PASS = os.environ.get("SSLCZ_STORE_PASS")
@@ -140,6 +141,10 @@ LOGIN_REDIRECT_URL = "http://localhost:3000/auth/callback" # React app callback 
 LOGOUT_REDIRECT_URL = 'http://localhost:3000/'
 SOCIALACCOUNT_ADAPTER = "project.authentication.account_adapter.CustomSocialAccountAdapter"
 
+CELERY_BROKER_URL = 'redis://localhost:6380/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6380/0'
+
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"  # Required for email verification
@@ -198,40 +203,42 @@ DATABASES = {
     }
 }
 
-DB_USERNAME = os.environ.get("POSTGRES_USER")
-DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
-DB_HOST = os.environ.get("POSTGRES_HOST")
-DB_PORT = os.environ.get("POSTGRES_PORT")
-DB_DATABASE = os.environ.get("POSTGRES_DB")
-DB_IS_AVAIL = all([DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT])
+# DB_USERNAME = os.environ.get("POSTGRES_USER")
+# DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
+# DB_HOST = os.environ.get("POSTGRES_HOST")
+# DB_PORT = os.environ.get("POSTGRES_PORT")
+# DB_DATABASE = os.environ.get("POSTGRES_DB")
+# DB_IS_AVAIL = all([DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT])
 
-DB_IGNORE_SSL = os.environ.get("DB_IGNORE_SSL") == "true"
+# DB_IGNORE_SSL = os.environ.get("DB_IGNORE_SSL") == "true"
 
-if DB_IS_AVAIL:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": DB_DATABASE,
-            "USER": DB_USERNAME,
-            "PASSWORD": DB_PASSWORD,
-            "HOST": DB_HOST,
-            "PORT": DB_PORT,
-        }
-    }
+# if DB_IS_AVAIL:
+#     DATABASES = {
+#         "default": {
+#             "ENGINE": "django.db.backends.postgresql",
+#             "NAME": DB_DATABASE,
+#             "USER": DB_USERNAME,
+#             "PASSWORD": DB_PASSWORD,
+#             "HOST": DB_HOST,
+#             "PORT": DB_PORT,
+#         }
+#     }
 
-    if not DB_IGNORE_SSL:
-        DATABASES["default"]["OPTIONS"] = {
-            'sslmode': 'require',
-        }
+# if not DB_IGNORE_SSL:
+#         DATABASES["default"]["OPTIONS"] = {
+#             'sslmode': 'require',
+#         }
 
 EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")
 EMAIL_HOST = os.getenv("EMAIL_HOST")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT"))
+EMAIL_PORT = (os.getenv("EMAIL_PORT"))
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS") == "True"
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 # Password validation
+SOCIALACCOUNT_STORE_TOKENS = True
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -252,6 +259,7 @@ LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
+SITE_ID = 3
 
 # # Static files (CSS, JavaScript, Images)
 # STATIC_URL = "/static/"

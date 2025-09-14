@@ -103,14 +103,14 @@ const venueCard = ({ venue }: { venue: Venue }) => {
         </div>
 
         {/* Created Date */}
-        <div className="flex items-center space-x-3 pt-2 border-t border-gray-100">
+        {/* <div className="flex items-center space-x-3 pt-2 border-t border-gray-100">
           <Calendar className="h-4 w-4 text-gray-500" />
           <span className="text-xs text-gray-500">Added {formatDate(venue.created_at)}</span>
           
-        </div>
+        </div> */}
         { venue.is_active &&
          <Link href={`/events/create?id=${venue.id}`} className="" > <button
-           className="text-sm bg-blue-500 py-2 px-2 mt-2 text-white rounded-lg flex items-center gap-2"
+           className="text-sm  py-2 px-2 my-2 text-blue-500 font-bold border border-blue-500 rounded-lg flex items-center gap-2"
          >
         
           <Calendar className="text-sm"></Calendar>Add Event

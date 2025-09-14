@@ -12,16 +12,24 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useInitiatePaymentMutation } from "@/redux/api/paymentApi"
 
 export default function Checkout() {
+  const formateDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }
+    return new Date(dateString).toLocaleDateString(undefined, options)
+  }
+  
+
   const searchParams = useSearchParams()
   const orderId = searchParams.get("id")
   const query = { id: orderId ? parseInt(orderId) : undefined }
   const { data: orders, isLoading } = useGetOrdersQuery(query)
 
   const defaultPaymentValues = {
-    event_id: orders?.event?.id,
-    amount: orders?.total_amount || 0,
-    name: orders?.user?.username || "",
-    email: orders?.user?.email || "",
+    id: orderId,
+   
   }
   const [initiatePayment] = useInitiatePaymentMutation()
 
@@ -66,8 +74,8 @@ export default function Checkout() {
                 <div className="bg-white rounded-lg shadow-md p-6">
                   <h2 className="text-xl font-semibold mb-4">Contact Information</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <ReUseInput name="name" label="Full Name" type="text" />
-                    <ReUseInput name="email" label="Email Address" type="email" />
+                    <p><span className="font-bold">Name:</span> {orders?.user?.username }</p>
+                    <p><span className="font-bold">Email:</span> {orders?.user?.email }</p>
                   </div>
                 </div>
               </div>
@@ -82,6 +90,10 @@ export default function Checkout() {
                     <p className="text-sm text-gray-600 mt-1">
                       {orders?.event?.venue?.name || "Venue Name"},{" "}
                       {orders?.event?.venue?.address || "Address"}
+                                      
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {formateDate(orders?.event?.event_date || "Event Date")} 
                     </p>
                   </div>
 

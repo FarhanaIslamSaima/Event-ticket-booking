@@ -13,6 +13,7 @@ import {useGetCategoriesQuery} from "@/redux/api/categoryApi"
 import { on } from "events"
 
 export default function Home() {
+ 
   const [searchQuery, setSearchQuery] = useState("")
   const { data: eventsData, isLoading, error } = useGetEventsQuery()
   const { data: categories } = useGetCategoriesQuery()
@@ -63,7 +64,7 @@ interface EventProps {
                 Concerts, sports, theater, and more - all in one place
               </p>
 
-              <div className="mt-8 max-w-xl mx-auto">
+              {/* <div className="mt-8 max-w-xl mx-auto">
                 <div className="flex items-center bg-white rounded-lg overflow-hidden p-1">
                   <div className="pl-3">
                     <Search className="h-5 w-5 text-gray-400" />
@@ -79,7 +80,7 @@ interface EventProps {
                     Search
                   </button>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </section>

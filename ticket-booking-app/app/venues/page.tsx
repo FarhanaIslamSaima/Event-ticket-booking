@@ -12,6 +12,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 import VenueCard from "@/components/ui/Card/venueCard"
 import type { Venue } from "@/types/venue" // Import Venue type
+import Link from "next/link"
 
 const Page = () => {
   const router = useRouter()
@@ -148,41 +149,58 @@ const Page = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Building2 className="h-8 w-8 text-blue-600" />
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Venues</h1>
-                <p className="text-gray-600 mt-1">
-                  {!isLoading && !isError && (
-                    <>
-                      {totalVenues} venue{totalVenues !== 1 ? "s" : ""} found
-                      {totalPages > 1 && (
-                        <span className="text-gray-500">
-                          {" • "}Page {currentPage} of {totalPages}
-                        </span>
-                      )}
-                      {activeFiltersCount > 0 && (
-                        <span className="text-blue-600">
-                          {" • "}
-                          {activeFiltersCount} filter
-                          {activeFiltersCount !== 1 ? "s" : ""} active
-                        </span>
-                      )}
-                    </>
-                  )}
-                </p>
-              </div>
-            </div>
-
-            <Button onClick={() => refetch()} disabled={isFetching} variant="outline" size="sm">
-              <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? "animate-spin" : ""}`} />
-              Refresh
-            </Button>
-          </div>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+      
+      {/* Left: Icon + Title + Info */}
+      <div className="flex items-center space-x-4">
+        <Building2 className="h-10 w-10 text-blue-600" />
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Venues</h1>
+          {!isLoading && !isError && (
+            <p className="text-gray-600 mt-1 text-sm md:text-base">
+              {totalVenues} venue{totalVenues !== 1 ? "s" : ""} found
+              {totalPages > 1 && (
+                <span className="text-gray-500">
+                  {" • "}Page {currentPage} of {totalPages}
+                </span>
+              )}
+              {activeFiltersCount > 0 && (
+                <span className="text-blue-600">
+                  {" • "} {activeFiltersCount} filter
+                  {activeFiltersCount !== 1 ? "s" : ""} active
+                </span>
+              )}
+            </p>
+          )}
         </div>
       </div>
+
+      {/* Right: Action Buttons */}
+      <div className="flex items-center space-x-3">
+       <Link href="/venues/create"> <Button variant="outline" size="sm">
+          Create Venue
+        </Button></Link>
+        <Button
+          onClick={() => refetch()}
+          disabled={isFetching}
+          variant="outline"
+          size="sm"
+          className="flex items-center"
+        >
+          <RefreshCw
+            className={`h-4 w-4 mr-2 transition-transform ${
+              isFetching ? "animate-spin" : ""
+            }`}
+          />
+          Refresh
+        </Button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 
       {/* Filters */}
       <div className="bg-white border-b">

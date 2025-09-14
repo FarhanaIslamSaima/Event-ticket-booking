@@ -22,10 +22,11 @@ import { useSearchParams } from "next/navigation";
 import { defaultOrderValues } from "@/validation/orderValidation";
 import { orderValidationSchema } from "@/validation/orderValidation";
 import { useCreateOrderMutation } from "@/redux/api/orderApi";
+import {toast} from "react-toastify"
 
 export default function EventDetails() {
   const [createOrder] = useCreateOrderMutation();
-const [quantity, setQuantity] =useState(1);
+const [quantity, setQuantity] =useState(0);
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -55,14 +56,14 @@ const [quantity, setQuantity] =useState(1);
       const res = await createOrder(data).unwrap();
       console.log("Response from createOrder:", res);
       if (res?.id) {
-        alert("Order created successfully!");
+        toast.success("Order created successfully! Please proceed to checkout within 30 minutes.");
         window.location.href = `/checkout?id=${res.id}`;
       } else {
-        alert("Failed to create order. Please try again.");
+        toast.error("Failed to create order. Please try again.");
       }
     } catch (error) {
       console.error("Order creation error:", error);
-      alert("Failed to create order. Please try again.");
+      toast.error("Failed to create order. Please try again.");
     }
   };
 
@@ -212,12 +213,13 @@ const [quantity, setQuantity] =useState(1);
                   resolver={zodResolver(orderValidationSchema)}
                 >
                   <div className="space-y-4 mb-6">
+                   
                     <div>
                       <ReUseSelect
                         name="number_of_tickets"
                         label="Number of Tickets"
                         options={Array.from(
-                          { length: Math.min(eventData?.total_tickets || 8, 8) },
+                          { length: Math.min(eventData?.total_tickets ) },
                           (_, i) => ({
                             name: String(i + 1),
                             id: i + 1,

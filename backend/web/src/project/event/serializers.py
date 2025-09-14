@@ -1,7 +1,7 @@
 import uuid
 from rest_framework import serializers
 from project.event.models import Event, Category, Venue, Order
-
+from django.db import transaction
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -77,10 +77,24 @@ class OrderSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         event = validated_data['event']
         number_of_tickets = validated_data['number_of_tickets']
+       
 
         validated_data['user'] = user
         validated_data['total_amount'] = number_of_tickets * event.base_price
         validated_data['status'] = 'due'          # ✅ set default status to due
-        validated_data['tran_id'] = str(uuid.uuid4())  # ✅ generate unique transaction id
+        validated_data['tran_id'] = str(uuid.uuid4()) 
+                # ✅ Ensure both order creation and ticket reduction happen atomically
+        with transaction.atomic():
+            # First create the order
+            order = super().create(validated_data)
 
-        return super().create(validated_data)
+            # Then reduce tickets (after order is successfully saved)
+            if event.total_tickets < number_of_tickets:
+                raise serializers.ValidationError(
+                    {"detail": "Not enough tickets available for this event."}
+                )
+
+            event.total_tickets -= number_of_tickets
+            event.save(update_fields=['total_tickets'])
+
+        return order # ✅ generate unique transaction id

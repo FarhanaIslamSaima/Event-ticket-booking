@@ -21,6 +21,16 @@ const eventApi = baseApi.injectEndpoints({
       },
      
     }),
+   getFeaturedEvents: builder.query<any[], void>({  // void = no argument needed
+  query: () => ({
+    url: "/featured-events/",
+    method: "GET",
+  }),
+  transformResponse: (response: any) => {
+    return response },
+  providesTags: [tagTypes.event],
+}),
+
     createEvent: builder.mutation({
       query: (data) => ({
       
@@ -34,4 +44,4 @@ const eventApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetEventsQuery, useCreateEventMutation } = eventApi;
+export const { useGetEventsQuery, useCreateEventMutation, useGetFeaturedEventsQuery } = eventApi;

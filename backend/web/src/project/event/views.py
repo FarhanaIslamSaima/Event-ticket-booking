@@ -3,7 +3,11 @@ from rest_framework import generics,permissions
 from rest_framework.response import Response
 from .models import Event, Category, Venue, Order
 from .serializers import EventSerializer, CategorySerializer, VenueSerializer, OrderSerializer
-
+from rest_framework.views import APIView
+from django.db.models import Sum, Q, F
+from django.utils.timezone import now
+from rest_framework.permissions import AllowAny
+from rest_framework.generics import ListAPIView
 
 class VenueListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = VenueSerializer
@@ -87,6 +91,23 @@ class VenueListCreateAPIView(generics.ListCreateAPIView):
 
 
 # Create your views here.
+class FeaturedEventsView(generics.ListAPIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []  
+
+    def get(self, request):
+        featured_event = Event.objects.annotate(
+            total_sold=Sum(
+                'order__number_of_tickets',
+                filter=Q(order__status='paid')  # Only paid orders
+            )
+        ).order_by('-total_sold').first()  # Retrieve only the top one
+
+        if not featured_event:
+            return Response({"detail": "No upcoming events found."})
+
+        serializer = EventSerializer(featured_event)
+        return Response(serializer.data)
 class EventListCreateAPIView(generics.ListCreateAPIView):
 
     def get_queryset(self):

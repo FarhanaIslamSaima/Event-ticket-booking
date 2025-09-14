@@ -1,10 +1,8 @@
 import { z } from "zod";
 
 export const paymentValidationSchema = z.object({
-  event_id: z.coerce.number().optional(),
-  amount: z.coerce.number().positive("Amount must be greater than 0"),
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
+  id: z.coerce.number().optional(),
+
 });
 
 // Default values for payment form

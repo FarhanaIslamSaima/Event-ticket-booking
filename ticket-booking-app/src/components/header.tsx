@@ -5,13 +5,19 @@ import { Menu, X, User, Ticket, ShoppingCart } from "lucide-react"
 import { Disclosure } from "@headlessui/react"
 import Link from "next/link"
 import AuthButton from "./ui/Button/AuthButton"
+import { useGetOrdersQuery } from "@/Redux/api/orderApi"
 
 export default function Header() {
   const [cartCount, setCartCount] = useState(0)
+  const query={
+    status:"due"
+  }
+  const { data: ordersData, isLoading, error } = useGetOrdersQuery(query)
+  console.log("Orders Data:", ordersData)
 
   const navigation = [
     { name: "Home", href: "/", current: true },
-    { name: "Events", href: "/events", current: false },
+ 
     { name: "Venues", href: "/venues", current: false },
     { name: "My Tickets", href: "/my-tickets", current: false },
     { name: "Help", href: "/help", current: false },
@@ -47,14 +53,15 @@ export default function Header() {
                 </div>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
-                <button className="relative p-1 rounded-full text-gray-500 hover:text-gray-700 focus:outline-none">
+              <Link href={`/cart`}>
+                <button className="ml-auto flex-shrink-0 bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none relative">
                   <ShoppingCart className="h-6 w-6" />
-                  {cartCount > 0 && (
+                  {ordersData?.length > 0 && (
                     <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-purple-600 rounded-full">
-                      {cartCount}
+                      {ordersData?.length}
                     </span>
                   )}
-                </button>
+                </button></Link> 
               
                 <AuthButton />
 
